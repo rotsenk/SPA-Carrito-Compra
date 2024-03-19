@@ -9,7 +9,7 @@ vámonos a la `App.jsx`...
 - La App es la que tiene el estado y el cálculo de los productos filtrados
 - Tiene el estado de filtros
 - Cuando se vaya bajando hacia los componentes, la `App` tiene dos hijos renderizando que son `Header` y `Products`, mientras que `Products` no tiene más hijos, pero `Header` sí, que es `Filters` es el que lee y actualiza el estado de los filtros
-- Por eso tenemos que pasar el `setFilter` de la App al `Header` y del `Header` al `Filter`, eso es drop drilling.
+- Por eso tenemos que pasar el `setFilter` de la App al `Header` y del `Header` al `Filter`, eso es prop drilling.
 
 desde la App al Header:
 ```js
