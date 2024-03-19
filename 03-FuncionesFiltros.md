@@ -4,6 +4,8 @@ vámonos a la `App.jsx`...
 
 - El `setFilters` se lo tenemos que pasar al `<Header />` porque el filtrado de productos lo tenemos a nivel de la App
 
+![alt text](image.png)
+
 - La App es la que tiene el estado y el cálculo de los productos filtrados
 - Tiene el estado de filtros
 - Cuando se vaya bajando hacia los componentes, la `App` tiene dos hijos renderizando que son `Header` y `Products`, mientras que `Products` no tiene más hijos, pero `Header` sí, que es `Filters` es el que lee y actualiza el estado de los filtros
