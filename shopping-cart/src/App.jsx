@@ -6,6 +6,7 @@ import { Header } from "./components/Header";
 
 function App() {
   const [products] = useState(initialProducts);
+  //el setFilters se lo tenemos que pasar al header, para que funcione
   const [filters, setFilters] = useState({
     category: 'all',
     minPrice: 0
@@ -26,7 +27,7 @@ function App() {
 
   return (
     <>
-      <Header />
+      <Header changeFilters={ setFilters } />
       <Products products={ filteredProducts } />
     </>
   );
