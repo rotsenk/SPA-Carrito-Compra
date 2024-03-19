@@ -147,3 +147,9 @@ export default App;
     flex-direction: column;
 }
 ```
+
+- `display: grid;`: Aplica el modelo de caja de cuadrícula para el diseño de la lista de productos.
+- `grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));`: Define las columnas de la cuadrícula de manera que se ajusten automáticamente al ancho del contenedor, con un ancho mínimo de 100px y se expandan para llenar el espacio disponible.
+- `gap: 1rem;`: Establece un espacio de 1rem entre las celdas de la cuadrícula.
+- `display: flex;`: Utiliza el modelo de caja flexbox para los elementos de la lista de productos.
+- `flex-direction: column;`: Establece que los elementos de la lista se apilen verticalmente, es decir, que su eje principal sea vertical.
