@@ -435,3 +435,216 @@ por ahora funciona.
 
 Es súper importante muchas veces hacer los cambios iterativos
 ahora podemos ver que con los pocos cambios que hemos hecho, ya tenemos un estado global en nuestro componente. Esto renderiza los componentes que están dentro del proveedor.
+
+# cuándo usar useContext?
+useContext, como estado global está pensado para estados muy pequeños, para estados que cambien con poca frecuencia. Ej: que el usuario tenga la sesión abierta, no sucede tanto, no sucede que cierra y abre sesión a cada rato.
+
+aquí con todo lo que hemos hecho, hemos generado un estado global, pero aún así todavía no estamos haciendo bien esto, seguimos haciendo prop drilling, pero lo bueno es que ahora gracias a lo que hemos hecho con useFilters podemos evitar el prop drilling
+
+# Crear una carpeta de hooks
+Vamos a crear una carpeta donde almacenaremos los hooks, esta estará en `src` a nivel de `components`, `mocks` 
+- Creamos un archivo dentro de esa carpeta `hooks` llamado `useFilters.jsx`
+
+Una de las ventajas de esto, es que estamos haciendo que nuestros componentes tengan una menor carga de lógica, posible, y simplificando al máximo, lo que están renderizando.
+
+código quedaría así:
+```jsx
+import { useContext } from "react";
+import { FiltersContext } from "../context/filters";
+
+
+export function useFilters(){
+
+    const { filters, setFilters } = useContext(FiltersContext);
+  
+    const filterProducts = (products) => {
+      return products.filter(product => {
+        return(
+          product.price >= filters.minPrice && (
+            filters.category === 'all' ||
+            product.category === filters.category
+          )
+        )
+      })
+    }
+  
+    return { filters, filterProducts, setFilters }
+  
+  }
+```
+
+Ahora el código de `App.jsx`quedaría así:
+```jsx
+import { useState } from "react";
+import { Products } from "./components/Products";
+import { products as initialProducts } from "./mocks/products.json";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { IS_DEVELOPMENT } from './config.js';
+import { useFilters } from "./hooks/useFilters.jsx";
+
+function App() {
+  const [products] = useState(initialProducts);
+
+  const { filters, filterProducts, setFilters } = useFilters();//esto es lo unico que será que necesite nuestra app
+
+  const filteredProducts = filterProducts(products);
+
+  return (
+    <>
+      <Header changeFilters={ setFilters } />
+      <Products products={ filteredProducts } />
+      {IS_DEVELOPMENT && <Footer filters={ filters } />}
+    </>
+  );
+}
+
+export default App;
+
+```
+
+y podemos seguir modificando para evitar el prop drilling
+
+- Empecemos por el `<Header />` en este estamos trayendo el `setFilters` para pasarselo como prop, se lo vamos a quitar. 
+
+```jsx
+import { useState } from "react";
+import { Products } from "./components/Products";
+import { products as initialProducts } from "./mocks/products.json";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { IS_DEVELOPMENT } from './config.js';
+import { useFilters } from "./hooks/useFilters.jsx";
+
+function App() {
+  const [products] = useState(initialProducts);
+
+  const { filters, filterProducts, setFilters } = useFilters();//esto es lo unico que será que necesite nuestra app
+
+  const filteredProducts = filterProducts(products);
+
+  return (
+    <>
+      <Header />
+      <Products products={ filteredProducts } />
+      {IS_DEVELOPMENT && <Footer filters={ filters } />}
+    </>
+  );
+}
+
+export default App;
+```
+
+- Luego dentro de `Header.jsx` vamos a quitar el changeFilter y vamos a dejar que simplemente renderice el `<Filter />`
+
+```jsx
+import { Filters } from './Filters.jsx';
+
+export function Header () {
+    return(
+        <header>
+            <h1>React Shop</h1>
+            <Filters />
+        </header>
+    )
+}
+```
+
+- Luego, nos dirigimos al `Filter.jsx` y le vamos a quitar el `onChange`
+
+```jsx
+import { useState } from "react";
+import { Products } from "./components/Products";
+import { products as initialProducts } from "./mocks/products.json";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { IS_DEVELOPMENT } from './config.js';
+import { useFilters } from "./hooks/useFilters.jsx";
+
+function App() {
+  const [products] = useState(initialProducts);
+
+  const { filters, filterProducts, setFilters } = useFilters();
+  //esto es lo unico que será que necesite nuestra app, setFilters
+
+  const filteredProducts = filterProducts(products);
+
+  return (
+    <>
+      <Header />
+      <Products products={ filteredProducts } />
+      {IS_DEVELOPMENT && <Footer filters={ filters } />}
+    </>
+  );
+}
+
+export default App;
+```
+
+- Ahora vamos a `Filters.jsx` y modificamos
+```jsx
+import { useState, useId } from 'react';
+import './Filters.css';
+import { useFilters } from '../hooks/useFilters';
+
+export function Filters () {
+    const { setFilters } = useFilters();//cada vez que queramos cambiar el estado
+
+    const  [minPrice, setMinPrice] = useState(0);
+ 
+    const minPriceFilterId = useId();
+    const categoryFilterId = useId();
+    
+    const handleChangePrice = (event) => {
+        setMinPrice(event.target.value);
+        setFilters(prevState => ({
+            ...prevState,
+            minPrice: event.target.value
+        }))
+    }
+
+    const handleChangeCategory = (event) =>{
+        setFilters(prevState => ({
+            ...prevState,
+            category: event.target.value
+        }))
+    }
+    //y lo colocamos en el Select
+
+    return(
+        <section className="filters">
+            <div>
+                <label htmlFor={ minPriceFilterId }>Precio desde:</label>
+                <input 
+                    type="range"
+                    id={ minPriceFilterId }
+                    min='0'
+                    max='1000' 
+                    onChange={ handleChangePrice }
+                />
+                <span>${ minPrice }</span>
+            </div>
+
+            <div>
+                <label htmlFor={ categoryFilterId }>Categoría</label>
+                <select name="category" id={ categoryFilterId } onChange={ handleChangeCategory }>
+                    <option value="all">Todas</option>
+                    <option value="laptops">Laptops</option>
+                    <option value="smartphones">Celulares</option>
+                </select>
+            </div>
+        </section>
+    )
+}
+```
+
+- Listo, ahora ya no necesito tener el `setFilter` de aquí `const { filters, filterProducts, setFilters } = useFilters();` en nuestra `App.jsx` procedemos a quitarlo
+
+Y con esto qué hemos hecho?
+- en el `<Header />` de `App.jsx` hemos quitado la props que se le pasaba, en el `useFilters()` quitamos el `setFilter` en el `Header.jsx` limpiamos, y en `Filters.jsx` lo que hicimos es traer el `setFilters` directamente del estado de los filtros.
+
+Esto está muy bien, porque nos ha simplificado la lógica del useFilters la tenemos totalmente separada de los propios filters.
+
+Esto funciona perfectamente, eliminamos todo el prop drilling, haciendo el estado global.
+
+> Errores que se comenten en React: es el tema de tener dos fuentes de la verdad... que veremos en el otro capítulo...

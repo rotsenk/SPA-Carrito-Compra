@@ -1,24 +1,25 @@
 import { useState, useId } from 'react';
 import './Filters.css';
+import { useFilters } from '../hooks/useFilters';
 
-export function Filters ({ onChange }) {
+export function Filters () {
+    const { setFilters } = useFilters();//cada vez que queramos cambiar el estado
+
     const  [minPrice, setMinPrice] = useState(0);
-    //generando dos Ids
-    const minPriceFilterId = useId();//colocamos esto dentro de label htmlFor y el input
+ 
+    const minPriceFilterId = useId();
     const categoryFilterId = useId();
-
-    console.log({ minPriceFilterId, categoryFilterId });
     
     const handleChangePrice = (event) => {
         setMinPrice(event.target.value);
-        onChange(prevState => ({
+        setFilters(prevState => ({
             ...prevState,
             minPrice: event.target.value
         }))
     }
 
     const handleChangeCategory = (event) =>{
-        onChange(prevState => ({
+        setFilters(prevState => ({
             ...prevState,
             category: event.target.value
         }))
