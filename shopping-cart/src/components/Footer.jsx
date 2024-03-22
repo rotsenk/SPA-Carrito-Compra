@@ -1,8 +1,10 @@
+import { useFilters } from '../hooks/useFilters';
 import './Footer.css'
 
-//pasamos filters como props
-//se puede construir una especie de Debugger
-export function Footer ({ filters }) {
+//en lugar de pasarselo por props
+export function Footer () {
+  const { filters } = useFilters();
+
   return (
     <footer className='footer'>
       {

@@ -1,17 +1,15 @@
-import { useState, useId } from 'react';
+import { useId } from 'react';
 import './Filters.css';
 import { useFilters } from '../hooks/useFilters';
 
 export function Filters () {
-    const { setFilters } = useFilters();//cada vez que queramos cambiar el estado
-
-    const  [minPrice, setMinPrice] = useState(0);
+    //nos vamos a fiar de los filtros globales.
+    const { filters, setFilters } = useFilters();
  
     const minPriceFilterId = useId();
     const categoryFilterId = useId();
     
     const handleChangePrice = (event) => {
-        setMinPrice(event.target.value);
         setFilters(prevState => ({
             ...prevState,
             minPrice: event.target.value
@@ -24,7 +22,6 @@ export function Filters () {
             category: event.target.value
         }))
     }
-    //y lo colocamos en el Select
 
     return(
         <section className="filters">
@@ -36,8 +33,9 @@ export function Filters () {
                     min='0'
                     max='1000' 
                     onChange={ handleChangePrice }
+                    value={ filters.minPrice }
                 />
-                <span>${ minPrice }</span>
+                <span>${ filters.minPrice }</span>
             </div>
 
             <div>

@@ -9,8 +9,7 @@ import { useFilters } from "./hooks/useFilters.jsx";
 function App() {
   const [products] = useState(initialProducts);
 
-  const { filters, filterProducts } = useFilters();
-  //esto es lo unico que será que necesite nuestra app, setFilters
+  const { filterProducts } = useFilters();
 
   const filteredProducts = filterProducts(products);
 
@@ -18,7 +17,7 @@ function App() {
     <>
       <Header />
       <Products products={ filteredProducts } />
-      {IS_DEVELOPMENT && <Footer filters={ filters } />}
+      {IS_DEVELOPMENT && <Footer />}
     </>
   );
 }
