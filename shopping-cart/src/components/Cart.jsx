@@ -29,15 +29,21 @@ export function Cart() {
   //traemos la variable de estado que se llame addToCart
   const { cart, clearCart, addToCart } = useCart();
 
+  // Calcular el total de productos
+  const totalProducts = cart.reduce((total, product) => total + product.quantity, 0);
+
+  // Calcular la cantidad a pagar
+  const totalAmount = cart.reduce((total, product) => total + product.price * product.quantity, 0);
+
   return (
     <>
       <label className="cart-button" htmlFor={cartCheckboxId}>
         <CartIcon />
       </label>
       <input id={cartCheckboxId} type="checkbox" hidden />
-
+      
       <aside className="cart">
-        <ul>
+        <ul style={{ maxHeight: '440px', overflow: 'auto' }} >
           {
             cart.map( product => (
               <CartItem 
@@ -48,7 +54,8 @@ export function Cart() {
             ))
           }
         </ul>
-
+        <p>Productos: { totalProducts }</p>
+        <p>Total pagar: ${ totalAmount }</p>
         <button style={{ background: "#E36414" }} onClick={clearCart}>
           <ClearCartIcon />
         </button>

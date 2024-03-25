@@ -58,3 +58,9 @@
     display: block;
   }
   
+  p{
+    margin: 0;
+    margin-bottom: 0.1rem;
+    padding: 1%;
+    font-size: 14px;
+  }
