@@ -1,45 +1,82 @@
-import { createContext, useState } from "react";
+import { createContext, useReducer} from "react";
 
-//1. Crear el contexto
 export const CartContext = createContext();
 
-//2. Crear el proveedor
-export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+// para guardar del localStorage lo que hay en el carrito
+const initialState = JSON.parse(window.localStorage.getItem('cart')) || [];
 
-  const addToCart = (product) => {
-    const productInCartIndex = cart.findIndex((item) => item.id === product.id);
+// update localStorage con el state para el carrito
+export const updateLocalStorage = state => {
+  window.localStorage.setItem('cart', JSON.stringify(state))
+}
+// todo esto va antes de cada return, se debe actualizar con el nuevo estado
 
-    if (productInCartIndex >= 0) {
-      const newCart = structuredClone(cart);
-      newCart[productInCartIndex].quantity += 1;
-      return setCart(newCart);
+const reducer = (state, action) => {
+
+  const { type: actionType, payload: actionPayload } = action;
+  
+  switch (actionType) {
+    case 'ADD_TO_CART': {
+      const { id } = actionPayload;
+      //checar si el producto existía, ahora ya no lo buscamos en cart sino en state
+      const productInCartIndex = state.findIndex((item) => item.id === id);
+
+      if (productInCartIndex >= 0) {
+        const newState = structuredClone(state);
+        newState[productInCartIndex].quantity += 1;
+        updateLocalStorage(newState);
+        return newState;
+      }
+
+      // en lugar de un return hacemos un newState
+      const newState = [
+        ...state,
+        {
+          ...actionPayload,// product
+          quantity: 1
+        }
+      ]
+
+      updateLocalStorage(newState);// asegurarnos que actualizamos con el nuevo estado
+      return newState;
+    }
+    
+    case 'REMOVE_FROM_CART': {
+      const { id } = actionPayload;
+      const newState = state.filter(item => item.id != id);
+      updateLocalStorage(newState);
+      return newState;
     }
 
-    setCart((prevState) => [
-      ...prevState,
-      {
-        ...product,
-        quantity: 1,
-      },
-    ]);
-  };
+    case 'CLEAR_CART': {
+      const newState = [];
+      updateLocalStorage(newState);
+      return newState;// hacemos un reset
+    }
+  }
 
-  //para remover del carrito
-  //con el setter y el previous state
-  const removeFromCart = product => {
-    setCart(prevState => prevState.filter(item => item.id != product.id));
-    //filtramos los productos que tengan un id diferente
-  }//luego lo pasamos en value del proveedor
+  return state
+}
 
-  const clearCart = () => {
-    setCart([]); //para limpiar el cart ponemos el array vacío
-  };
+export function CartProvider({ children }) {
+  const [ state, dispatch ] = useReducer(reducer, initialState);
+  
+  const addToCart = product => dispatch({
+    type: 'ADD_TO_CART',
+    payload: product
+  })
+
+  const removeFromCart = product => dispatch({
+    type: 'REMOVE_FROM_CART',
+    payload: product
+  })
+
+  const clearCart = () => dispatch({ type: 'CLEAR_CART' })
 
   return (
     <CartContext.Provider
       value={{
-        cart,
+        cart: state,
         addToCart,
         removeFromCart,
         clearCart,
