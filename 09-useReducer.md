@@ -259,3 +259,6 @@ export function Cart() {
   );
 }
 ```
+
+Habiendo terminado esto, podemos ver una intro a Redux, explicación visual de este patrón.
+https://www.youtube.com/watch?v=j-jzI3wkkVk
