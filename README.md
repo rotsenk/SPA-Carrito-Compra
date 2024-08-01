@@ -1,3 +1,6 @@
+# Intro
+This project was carried out with the objective of training technical skills with react in the consultancy of the FUSALMO MISEREOR project.
+
 # SPA-Carrito-Compra
 Desarrollo de aplicación de carrito de Compras con React
 

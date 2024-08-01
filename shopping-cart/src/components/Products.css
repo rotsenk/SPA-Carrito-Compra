@@ -10,7 +10,7 @@
     grid-template-columns: repeat(
         auto-fit,
         minmax(
-            150px,
+            125px,
             1fr
         )
     );
@@ -41,7 +41,7 @@
 .products img{
     border-radius: 4px;
     width: 100%;
-    aspect-ratio: 18/9;
+    aspect-ratio: 8/10;
     display: block;
     object-fit: cover;
     background: #fff;
